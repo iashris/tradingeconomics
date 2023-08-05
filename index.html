@@ -4,6 +4,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Explore Fed Data with Trading Economics and Ashris</title>
     <style>
+      html,
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+      }
       .background {
         fill: none;
         pointer-events: all;
@@ -56,7 +60,7 @@
         position: absolute;
         top: 0px;
         left: 0px;
-        z-index: 1000;
+        z-index: 400;
         background-color: #f9f9f9;
         border: 1px solid #ccc;
         width: 300px;
@@ -73,11 +77,104 @@
           top: inherit;
         }
       }
+
+      #data-selector {
+        width: 100%;
+      }
+
+      #spinner {
+        position: fixed;
+        z-index: 999;
+        height: 2em;
+        width: 2em;
+        overflow: show;
+        margin: auto;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+
+      #spinner:before {
+        content: "";
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.3);
+      }
+
+      .spinner {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        z-index: 9999;
+        left: 50%;
+        top: 50%;
+        margin: -50px 0 0 -50px;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+      }
+
+      #data-selector {
+        opacity: 0;
+      }
+
+      @-webkit-keyframes spin {
+        0% {
+          -webkit-transform: rotate(0deg);
+        }
+        100% {
+          -webkit-transform: rotate(360deg);
+        }
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .tooltip {
+        width: 100px;
+        height: 40px;
+        background: navy;
+        color: white;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        pointer-events: none;
+        font-size: 12px;
+        padding: 8px;
+        border-radius: 4px;
+        opacity: 0;
+      }
     </style>
   </head>
   <body>
-    <div class="ui">Hello</div>
+    <div class="ui">
+      <h1>Trading Economics Demo</h1>
+      <select id="data-selector"></select>
+      <div id="summary"></div>
+    </div>
+
     <div class="viz"></div>
+    <div id="spinner">
+      <div class="spinner"></div>
+    </div>
+    <div class="tooltip"></div>
+
     <script
       type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js"
