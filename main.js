@@ -1,16 +1,19 @@
-var margin = {
-    top: window.innerHeight > window.innerWidth ? 0.3 * innerHeight : 100,
-    bottom: 0,
-    left: window.innerHeight > window.innerWidth ? 0 : 300,
-    right: 0,
-  },
-  width = parseInt(d3.select(".viz").style("width")),
-  width = width - margin.left - margin.right,
-  mapRatio = 0.5,
-  height = width * mapRatio,
-  active = d3.select(null);
+const margin = {
+  top: window.innerHeight > window.innerWidth ? 0.3 * innerHeight : 100,
+  bottom: 0,
+  left: window.innerHeight > window.innerWidth ? 0 : 300,
+  right: 0,
+};
 
-var svg = d3
+let width = parseInt(d3.select(".viz").style("width"));
+width = width - margin.left - margin.right;
+const mapRatio = 0.5;
+const height = width * mapRatio;
+let active = d3.select(null);
+
+document.getElementById("spinner").style.display = "none";
+
+const svg = d3
   .select(".viz")
   .append("svg")
   .attr("class", "center-container")
@@ -24,16 +27,18 @@ svg
   .attr("width", width + margin.left + margin.right)
   .on("click", clicked);
 
-Promise.resolve(d3.json("we.json")).then(ready);
+Promise.resolve(d3.json("usa.json")).then(ready);
 
-var projection = d3
+const tooltip = d3.select(".tooltip");
+
+const projection = d3
   .geoAlbersUsa()
   .scale(width)
   .translate([width / 2, height / 2]);
 
-var path = d3.geoPath().projection(projection);
+const path = d3.geoPath().projection(projection);
 
-var g = svg
+const g = svg
   .append("g")
   .attr("class", "center-container center-items us-state")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
@@ -49,6 +54,10 @@ function ready(us) {
     .append("path")
     .attr("d", path)
     .attr("class", "county-boundary")
+    .attr("data-county", function (d) {
+      // Use the county's name as the key
+      return d.properties.name;
+    })
     .on("click", reset);
 
   g.append("g")
@@ -76,10 +85,11 @@ function ready(us) {
     })
     .attr("text-anchor", "middle")
     .style("font-family", "Arial")
+    .style("pointer-events", "none")
     .style("font-size", function (d) {
       // Scale the font size based on the state's area
-      var size = Math.sqrt(path.area(d)) / 8;
-      return size + "px"; // Adjust the constants as needed
+      const size = Math.sqrt(path.area(d)) / 8;
+      return size + "px";
     })
     .text(function (d) {
       return d.properties.name;
@@ -104,7 +114,7 @@ function clicked(d) {
   active.classed("active", false);
   active = d3.select(this).classed("active", true);
 
-  var bounds = path.bounds(d),
+  const bounds = path.bounds(d),
     dx = bounds[1][0] - bounds[0][0],
     dy = bounds[1][1] - bounds[0][1],
     x = (bounds[0][0] + bounds[1][0]) / 2,
@@ -129,11 +139,144 @@ function clicked(d) {
     .transition()
     .duration(750)
     .style("opacity", 0);
+
+  const stateName = d.properties.name.toLowerCase();
+
+  // Make the API call
+  document.getElementById("spinner").style.display = "block";
+
+  fetch(
+    `https://api.tradingeconomics.com/fred/snapshot/county/${stateName}?c=56dff1ca3fc2429:6f6uy5sxw22qpk6&f=json`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      appendDropdown(data);
+      document.getElementById("spinner").style.display = "none";
+
+      const categories = [
+        ...new Set(
+          data.map((item) => {
+            const category = item.Category;
+            if (category.includes(" in ")) {
+              return category.split(" in ")[0];
+            } else if (category.includes(" for ")) {
+              return category.split(" for ")[0];
+            } else {
+              return category;
+            }
+          })
+        ),
+      ];
+
+      updateChloropleth(
+        data.filter((d) => d.Category.split(" in ")[0] === categories[0])
+      );
+    })
+    .catch((error) => {
+      console.error("Error fetching data:", error);
+      document.getElementById("spinner").style.display = "none";
+    });
+}
+
+function appendDropdown(data) {
+  // Select the dropdown from the DOM
+  const dropdown = d3.select("#data-selector");
+
+  dropdown.style("opacity", "1");
+
+  // Remove any previously rendered options
+  dropdown.selectAll("option").remove();
+
+  // Get all unique categories from the data
+  const categories = [
+    ...new Set(
+      data.map((item) => {
+        const category = item.Category;
+        if (category.includes(" in ")) {
+          return category.split(" in ")[0];
+        } else if (category.includes(" for ")) {
+          return category.split(" for ")[0];
+        } else {
+          return category;
+        }
+      })
+    ),
+  ];
+
+  // Create new options for the dropdown
+  dropdown
+    .selectAll("option")
+    .data(categories)
+    .enter()
+    .append("option")
+    .attr("value", (d) => d)
+    .text((d) => d);
+
+  // Add an event listener for when the dropdown value changes
+  dropdown.on("change", function () {
+    const selectedCategory = this.value;
+    const filteredData = data.filter(
+      (item) =>
+        item.Category.startsWith(selectedCategory + " in ") ||
+        item.Category.startsWith(selectedCategory + " for ")
+    );
+    updateChloropleth(filteredData);
+  });
+}
+
+function updateChloropleth(data) {
+  const minData = d3.min(data, (d) => d.Last);
+  const maxData = d3.max(data, (d) => d.Last);
+  const meanData = d3.mean(data, (d) => d.Last);
+
+  const minCounty = data.find((d) => d.Last === minData).Country;
+  const maxCounty = data.find((d) => d.Last === maxData).Country;
+
+  // Update summary section
+  d3.select("#summary").html(`
+    <p>Max: ${maxData} (County: ${maxCounty})</p>
+    <p>Min: ${minData} (County: ${minCounty})</p>
+    <p>Mean: ${meanData}</p>
+  `);
+
+  // Define a color scale for the chloropleth
+  const colorScale = d3
+    .scaleSequential(d3.interpolateBlues)
+    .domain([d3.min(data, (d) => d.Last), d3.max(data, (d) => d.Last)]);
+
+  // Join the data to the counties
+  const dataLookup = new Map(data.map((item) => [item.Country, item]));
+
+  // Set the fill style for the counties
+  g.select("#counties")
+    .selectAll("path")
+    .style("fill", (d) => {
+      const item = dataLookup.get(d.properties.name);
+      return item ? colorScale(item.Last) : "#ccc";
+    });
+
+  g.select("#counties")
+    .selectAll("path")
+    .on("mouseover", function (d) {
+      // Find the corresponding item in the data
+      const item = data.find((item) => item.Country === d.properties.name);
+      if (item) {
+        tooltip.transition().duration(200).style("opacity", 1);
+        tooltip
+          .html(item.Country + "<br/>" + item.Last)
+          .style("left", d3.event.pageX + "px")
+          .style("top", d3.event.pageY - 28 + "px");
+      }
+    })
+    .on("mouseout", function (d) {
+      tooltip.transition().duration(500).style("opacity", 0);
+    });
 }
 
 function reset(d) {
   console.log(d);
   active.classed("active", false);
+  d3.select("#data-selector").style("opacity", "0");
   active = d3.select(null);
 
   g.transition()
