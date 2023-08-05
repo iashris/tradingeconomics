@@ -146,7 +146,7 @@ function clicked(d) {
   document.getElementById("spinner").style.display = "block";
 
   fetch(
-    `https://api.tradingeconomics.com/fred/snapshot/county/${stateName}?c=56dff1ca3fc2429:6f6uy5sxw22qpk6&f=json`
+    `https://api.tradingeconomics.com/fred/snapshot/county/${stateName}?c=94eec87e7d3d481:4xlnb9gd0lqsjx8&f=json`
   )
     .then((response) => response.json())
     .then((data) => {
