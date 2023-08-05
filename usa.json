@@ -5232,7 +5232,7 @@
           "type": "MultiPolygon",
           "arcs": [[[2800]]],
           "id": 25019,
-          "properties": { "name": "Nantucket County/town, MA" }
+          "properties": { "name": "Nantucket County, MA" }
         },
         {
           "type": "Polygon",
@@ -6931,7 +6931,7 @@
           "type": "Polygon",
           "arcs": [[-3610, 3641, 3642, -3434, -3338]],
           "id": 42101,
-          "properties": { "name": "Philadelphia County/city, PA" }
+          "properties": { "name": "Philadelphia County, PA" }
         },
         {
           "type": "Polygon",
@@ -7003,7 +7003,7 @@
           "type": "Polygon",
           "arcs": [[3683, 3684, 3685, -3564, -3044]],
           "id": 8014,
-          "properties": { "name": "Broomfield County/city, CO" }
+          "properties": { "name": "Broomfield County, CO" }
         },
         {
           "type": "Polygon",
@@ -7263,7 +7263,7 @@
           "type": "Polygon",
           "arcs": [[3811, -3807, -3747]],
           "id": 8031,
-          "properties": { "name": "Denver County/city, CO" }
+          "properties": { "name": "Denver County, CO" }
         },
         {
           "type": "MultiPolygon",
@@ -10263,7 +10263,7 @@
           "type": "MultiPolygon",
           "arcs": [[[5418, 5419]]],
           "id": 6075,
-          "properties": { "name": "San Francisco County/city, CA" }
+          "properties": { "name": "San Francisco County, CA" }
         },
         {
           "type": "Polygon",
@@ -19164,7 +19164,7 @@
           "type": "Polygon",
           "arcs": [[10288]],
           "id": 15003,
-          "properties": { "name": "Honolulu County/city, HI" }
+          "properties": { "name": "Honolulu County, HI" }
         },
         {
           "type": "Polygon",
@@ -19285,7 +19285,7 @@
             [[10382, 10383]]
           ],
           "id": 2110,
-          "properties": { "name": "Juneau Borough/city, AK" }
+          "properties": { "name": "Juneau Borough, AK" }
         },
         {
           "type": "MultiPolygon",
@@ -19334,7 +19334,7 @@
             [[10434, -10399, 10435, -10414, 10436]]
           ],
           "id": 2220,
-          "properties": { "name": "Sitka Borough/city, AK" }
+          "properties": { "name": "Sitka Borough, AK" }
         },
         {
           "type": "MultiPolygon",
@@ -19378,7 +19378,7 @@
           "type": "MultiPolygon",
           "arcs": [[[-10455, 10463, 10464, 10465]]],
           "id": 2020,
-          "properties": { "name": "Anchorage Borough/municipality, AK" }
+          "properties": { "name": "Anchorage Borough, AK" }
         },
         {
           "type": "MultiPolygon",
@@ -19418,7 +19418,7 @@
           "type": "MultiPolygon",
           "arcs": [[[10495, 10496, -10487, 10497, -10418, 10498]]],
           "id": 2282,
-          "properties": { "name": "Yakutat Borough/city, AK" }
+          "properties": { "name": "Yakutat Borough, AK" }
         },
         {
           "type": "Polygon",
